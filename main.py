@@ -1,10 +1,8 @@
+import time
 import requests
 import random
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 def generate_mail():
     male_litery = "abcdefghijklmnoqprstuwxyz"
@@ -30,7 +28,6 @@ def register_account(email):
     driver = webdriver.Chrome(service=service)
     registration_url = "https://www.adidas.se/account-register"
     driver.get(registration_url)
-    wait = WebDriverWait(driver, 10)
 
     #pliki cookie
     driver.find_element("css selector", "#glass-gdpr-default-consent-accept-button").click()
@@ -42,8 +39,8 @@ def register_account(email):
     driver.find_element("css selector", "#registration-lastname-field").send_keys("Inwalida")
 
     #płeć
-    radio_buttons = driver.find_elements(By.XPATH, "//input[@type='radio' and @class='gl-radio-input__input']")
-    radio_buttons[0].click()
+    radio_buttons = driver.find_element("css selector", ".gl-radio-input__option")
+    radio_buttons.click()
 
     #email
     driver.find_element("css selector", "#registration-email-field").send_keys(email)
@@ -64,10 +61,16 @@ def register_account(email):
     driver.find_element("css selector", "#doc-mrkt-email-club").click()
 
     #zarejestruj
-    driver.find_element("css selector", "#registration-submit-button").click()
+    driver.find_element("css selector", ".gl-cta__content").click()
 
 
-domeny = generate_domains()
-poczatek_maila = generate_mail()
-mail = poczatek_maila + random.choice(domeny)
-register_account(mail)
+while True:
+    domeny = generate_domains()
+    poczatek_maila = generate_mail()
+    mail = poczatek_maila + random.choice(domeny)
+    register_account(mail)
+
+    with open("emails.txt", "a") as file:
+        file.write(mail + "\n")
+
+    time.sleep(5)
